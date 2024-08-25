@@ -35,7 +35,7 @@ jobs:
     name: Build Application
     runs-on: ubuntu-latest
     needs: test
-    if: success() 
+    if: success()
 
     steps:
     - name: Checkout code
@@ -55,48 +55,43 @@ jobs:
       run: |
         npm run build
         echo "Build completed."
+
     - name: List build directory
       run: |
         echo "Listing contents of the build directory..."
         ls -la .next
         ls -la # List all directories to verify .next presence 
 
+    - name: Copy files to EC2 instance
+      run: |
+        if [ -d ".next" ]; then
+          scp -o StrictHostKeyChecking=no -r .next ubuntu@16.171.146.74:~/ci_cd/.next || echo "Error copying files."
+        else
+          echo ".next directory does not exist"
+          exit 1
+        fi
+
   deploy:
     name: Deploy to EC2
     runs-on: ubuntu-latest
     needs: build
-    if: success() 
+    if: success()
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
-
     - name: Set up SSH
       uses: webfactory/ssh-agent@v0.6.0
       with:
         ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-    - name: Deploy to EC2
+    - name: Connect to EC2 and deploy
       run: |
-        # Copy files to EC2 instance
-        scp -o StrictHostKeyChecking=no -r .next/* ubuntu@16.171.146.74:~/ci_cd/.next || echo "Error copying files."
-
-        # Connect to EC2 and deploy
         ssh -o StrictHostKeyChecking=no ubuntu@16.171.146.74 << 'EOF'
-          # Navigate to the deployment directory
           cd ~/ci_cd
 
-          # Install dependencies
-          npm install --production
+          # Restart the application using PM2
+          pm2 restart my-app || echo "Error restarting application."
 
-          # Start the application
-          npm start
-
-          # Check for errors and log output
-          if [ $? -ne 0 ]; then
-            echo "Deployment failed!"
-            exit 1
-          else
-            echo "Deployment successful!"
-          fi
+          # Check the status and logs
+          pm2 status
+          pm2 logs
         EOF
