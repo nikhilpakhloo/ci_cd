@@ -60,7 +60,7 @@ jobs:
 
     - name: Restart application on EC2
       run: |
-        ssh ubuntu@16.171.146.74 << 'EOF'
+        ssh -o StrictHostKeyChecking=no -t ubuntu@16.171.146.74 << 'EOF'
           cd ~/ci_cd
           pm2 restart ci_cd || pm2 start npm --name 'ci_cd' -- start
         EOF
