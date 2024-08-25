@@ -56,6 +56,14 @@ jobs:
         npm run build
         echo "Build completed."
 
+    - name: List build directory
+      run: |
+        echo "Listing contents of the build directory..."
+        ls -la .next
+        ls -la # List all directories to verify .next presence 
+
+      
+
   deploy:
     name: Deploy to EC2
     runs-on: ubuntu-latest
@@ -68,21 +76,19 @@ jobs:
       with:
         ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-    - name: Deploy to EC2
+    - name: Copying & Connect to EC2 and deploy
       run: |
+        if [ -d ".next" ]; then
+          scp -o StrictHostKeyChecking=no -r .next ubuntu@16.171.146.74:~//home/ubuntu/ci_cd || echo "Error copying files."
+        else
+          echo ".next directory does not exist"
+          exit 1
+        fi
         ssh -o StrictHostKeyChecking=no ubuntu@16.171.146.74 << 'EOF'
-          # Navigate to the application directory
-        
-
-          
-
-        
-         
-
-          
+          cd ~/ci_cd
 
           # Restart the application using PM2
-          pm2 restart ci_cd || { echo "Error restarting application"; exit 1; }
+          pm2 restart ci_cd || echo "Error restarting application."
 
           # Check the status and logs
           pm2 status
