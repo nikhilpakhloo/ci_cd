@@ -89,7 +89,7 @@ jobs:
           cd ~/ci_cd
 
           # Restart the application using PM2
-          pm2 restart my-app || echo "Error restarting application."
+          pm2 restart ci_cd || echo "Error restarting application."
 
           # Check the status and logs
           pm2 status
