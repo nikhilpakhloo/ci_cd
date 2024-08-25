@@ -61,8 +61,6 @@ jobs:
         ls -la .next
         ls -la # List all directories to verify .next presence 
 
-        
-
   deploy:
     name: Deploy to EC2
     runs-on: ubuntu-latest
@@ -79,21 +77,23 @@ jobs:
         ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
     - name: Deploy to EC2
+      env:
+        BUILD_DIR: $GITHUB_WORKSPACE/.next
       run: |
         # Copy files to EC2 instance
-          scp -o StrictHostKeyChecking=no -r /nikhilpakhloo/ci_cd/.next ubuntu@16.171.146.74:~/home/ubuntu/ci_cd || echo "Error copying files."
-
+        scp -o StrictHostKeyChecking=no -r $BUILD_DIR ubuntu@16.171.146.74:~/home/ubuntu/ci_cd || echo "Error copying files."
+  
         # Connect to EC2 and deploy
         ssh -o StrictHostKeyChecking=no ubuntu@16.171.146.74 << 'EOF'
           # Navigate to the deployment directory
           cd ~/ci_cd
-
+  
           # Install dependencies
           npm install --production
-
+  
           # Start the application
           npm start
-
+  
           # Check for errors and log output
           if [ $? -ne 0 ]; then
             echo "Deployment failed!"
