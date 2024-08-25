@@ -35,6 +35,13 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
+    - name: Set up SSH agent
+      uses: webfactory/ssh-agent@v0.5.3
+      with:
+        ssh-private-key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDPPd9c49k57TURTjwq56Of/Ym7FqrSaL7TsWq0DuCAUm+g4/TsCX2P3zGGSQSzMwdfdrtuIm5OAiwNvtgAafTc9cHc9rW1bQtfrzVGzL1n1inqtxahIxNSjHJOrCx0sy973R4J5AsmyHUi9y/jq538C/Z8E2e3+37yFa1Pfa+6+9M6SgXUmK3PJOrH8lBRXpReNv2IFODBH6L9vzjg1pgylaCWyJc6KdeEzXLAP2BkJwMXMxOdVfd1mGIHQUcAUPakgWfVJsQ+ZPsLcS0tsKjZA+7N1HOSCsk7Pj/OSEBIlLdcc970Ub2d6Hq295IDwroD6D3QJ4h++A211mwxHRhopApN+S2CMvOb+KpX1bpA7f+hjVZBM/0efkIfXKp2f1BsmSLxk5kETg+IlGlPivcQneOrI2jwZC/3EMBnuxibJrkG34QSIINKj9Qxz2gxsi8YAYCHNWmlF8QUL5NGztH7PFbDT1e+ZQc61riyth2EArZ2z1OUtU4VzEN1Nh7HWjcopwmzBEHIps8IQ4BeMPIzGe5Wx+5bvx4DMbCmKCHBLsz+1OBHxHlO0NPzlbWV8sXUgYEBT1YdMK+lXBG3/Gg6rRnblwrxzYBiTwIOzic7PaHUeo0idMDE2TIyusZ0QSqbZfEgI+NVOM4inUnuC/JVnelH0HK8COa7uEyatP3TUQ== nikhilpakhloo@gmail.com"
+    - name: Test SSH Connection
+      run: ssh -o StrictHostKeyChecking=no ec2-user@your-ec2-instance "echo 'SSH connection successful'"
+
     - name: Deploy to EC2
       run: |
         # Define the target directory and application zip file
@@ -58,3 +65,8 @@ jobs:
         pm2 restart my-app || pm2 start app.js --name my-app
         rm my-app.zip
         EOF
+
+    - name: Debug SSH
+      run: |
+        ssh-add -L
+        ssh -T git@github.com
