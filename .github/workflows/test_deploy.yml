@@ -62,14 +62,7 @@ jobs:
         ls -la .next
         ls -la # List all directories to verify .next presence 
 
-    - name: Copy files to EC2 instance
-      run: |
-        if [ -d ".next" ]; then
-          scp -o StrictHostKeyChecking=no -r .next ubuntu@16.171.146.74:~/ci_cd/.next || echo "Error copying files."
-        else
-          echo ".next directory does not exist"
-          exit 1
-        fi
+      
 
   deploy:
     name: Deploy to EC2
@@ -83,13 +76,19 @@ jobs:
       with:
         ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-    - name: Connect to EC2 and deploy
+    - name: Copying & Connect to EC2 and deploy
       run: |
+        if [ -d ".next" ]; then
+          scp -o StrictHostKeyChecking=no -r .next ubuntu@16.171.146.74:~/ci_cd/.next || echo "Error copying files."
+        else
+          echo ".next directory does not exist"
+          exit 1
+        fi
         ssh -o StrictHostKeyChecking=no ubuntu@16.171.146.74 << 'EOF'
           cd ~/ci_cd
 
           # Restart the application using PM2
-          pm2 restart ci_cd || echo "Error restarting application."
+          pm2 restart ci_cd || { echo "Error restarting application."; exit 1; }
 
           # Check the status and logs
           pm2 status
