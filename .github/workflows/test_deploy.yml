@@ -80,7 +80,7 @@ jobs:
      
       run: |
         # Copy files to EC2 instance
-        scp -o StrictHostKeyChecking=no -r build ubuntu@16.171.146.74:~/ci_cd || echo "Error copying files."
+        scp -o StrictHostKeyChecking=no -r .next ubuntu@16.171.146.74:~/ci_cd || echo "Error copying files."
   
         # Connect to EC2 and deploy
         ssh -o StrictHostKeyChecking=no ubuntu@16.171.146.74 << 'EOF'
