@@ -38,25 +38,13 @@ jobs:
     - name: Set up SSH agent
       uses: webfactory/ssh-agent@v0.5.3
       with:
-        ssh-private-key: '''-----BEGIN OPENSSH PRIVATE KEY-----
-          
-          
-          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
-        
-                              -----END OPENSSH PRIVATE KEY-----
-                                
-                                '''
-    - name: Test SSH Connection
-      run: ssh -o StrictHostKeyChecking=no ec2-user@your-ec2-instance "echo 'SSH connection successful'"
+        ssh-private-key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
 
     - name: Deploy to EC2
       run: |
         # Define the target directory and application zip file
         TARGET_DIR="/home/ubuntu/my-app"
         APP_ZIP="my-app.zip"
-
-        # Create the target directory if it doesn't exist
-        ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "mkdir -p $TARGET_DIR"
 
         # Zip the application code, excluding .git directory
         zip -r $APP_ZIP . -x "*.git*"
