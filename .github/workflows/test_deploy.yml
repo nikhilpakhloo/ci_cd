@@ -55,6 +55,11 @@ jobs:
       run: |
         npm run build
         echo "Build completed."
+    - name: List build directory
+      run: |
+        echo "Listing contents of the build directory..."
+        ls -la .next
+        ls -la # List all directories to verify .next presence 
 
   deploy:
     name: Deploy to EC2
