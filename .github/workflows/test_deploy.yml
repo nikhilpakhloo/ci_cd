@@ -1,9 +1,15 @@
-name: Test_Deploy
+name: CI
 
-on: [push, pull_request]
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
 
 jobs:
   test:
+    name: Test
     runs-on: ubuntu-latest
 
     steps:
@@ -26,42 +32,27 @@ jobs:
         npm test
         echo "Tests completed."
 
-  deploy:
+  build:
+    name: Build and Deploy
     runs-on: ubuntu-latest
-    needs: test    
-    if: success()  
-    
+    needs: test  
+
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+    - uses: actions/checkout@v3
 
-    - name: Set up SSH agent
-      uses: webfactory/ssh-agent@v0.5.3
+    - uses: actions/setup-node@v3
       with:
-        ssh-private-key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+        node-version: '20.15.0' 
 
-    - name: Deploy to EC2
-      run: |
-        # Define the target directory and application zip file
-        TARGET_DIR="/home/ubuntu/my-app"
-        APP_ZIP="my-app.zip"
+    - name: Install NPM dependencies
+      run: npm install
 
-        # Zip the application code, excluding .git directory
-        zip -r $APP_ZIP . -x "*.git*"
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
 
-        # Copy the zip file to EC2
-        scp -o StrictHostKeyChecking=no $APP_ZIP ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:$TARGET_DIR
-
-        # SSH into EC2 and deploy
-        ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
-        cd $TARGET_DIR
-        unzip -o my-app.zip
-        npm install
-        pm2 restart my-app || pm2 start app.js --name my-app
-        rm my-app.zip
-        EOF
-
-    - name: Debug SSH
-      run: |
-        ssh-add -L
-        ssh -T git@github.com
+    - name: Deploy Next.js app
+      run: npx serverless deploy
