@@ -7,6 +7,8 @@ export default function Home() {
       <h1>Hello Button</h1>
       <Button />
       <h1>How are you?</h1>
+      <Button />
+
     </div>
   );
 }
