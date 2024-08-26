@@ -12,6 +12,7 @@
 # next.js
 /.next/
 /out/
+/.github/workflows/test_deploy copy.yml/
 
 # production
 /build
