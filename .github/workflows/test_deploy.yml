@@ -48,7 +48,22 @@ jobs:
           git pull origin main
           npm install
           npm run build
-          pm2 restart all # Assuming you use PM2 to manage your Node.js process
+               if ! command -v pm2 &> /dev/null; then
+            echo "PM2 is not installed. Installing..."
+            sudo npm install -g pm2
+          fi
+
+          # Start the application with PM2
+          pm2 start /home/ubuntu/ --name ci_cd || true
+
+          # Restart the application if it is already running
+          pm2 restart your-app-name || true
+
+          # Save the PM2 process list
+          pm2 save
+
+          # List all PM2 processes
+          pm2 list
         EOF
 
 
