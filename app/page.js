@@ -6,6 +6,7 @@ export default function Home() {
     <div className="flex flex-col justify-center h-screen items-center">
       <h1>Hello Button</h1>
       <Button />
+      <h1>How are you?</h1>
     </div>
   );
 }
