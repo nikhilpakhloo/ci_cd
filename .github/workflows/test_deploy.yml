@@ -54,7 +54,7 @@ jobs:
           fi
 
           # Start the application with PM2
-          pm2 start --name ci_cd || true
+          pm2 start npm --name ci_cd -- start|| true
 
           # Restart the application if it is already running
           pm2 restart ci_cd || true
