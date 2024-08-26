@@ -10,7 +10,7 @@ export default function Home() {
         <Button />
       </div>
 
-      <h1>How are you?</h1>
+      <h1>Hello I am fine</h1>
       
     </div>
   );
